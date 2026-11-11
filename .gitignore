@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# tjdiag output (snapshots, logs, raw adapter traffic)
+tjdiag-data/
