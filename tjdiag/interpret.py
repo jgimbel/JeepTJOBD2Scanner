@@ -103,7 +103,7 @@ def _location(snapshot: dict, evidence: list[str]) -> list[int]:
             evidence.append(
                 "P0700 is set, so the transmission computer has codes of its own, "
                 "but it did not answer generic OBD requests. Those codes need a "
-                "Chrysler-capable scan tool or the Phase 2 interface to read."
+                "Chrysler-capable scan tool to read."
             )
     elif not tcm_answered:
         evidence.append(
@@ -319,8 +319,8 @@ def diagnose(events: list[dict]) -> Diagnosis:
         else:
             steps += [
                 "If power and grounds are good, the fault is inside the engine computer. "
-                "Phase 2 (docs/phase2-sci-interface.md) reads its memory over the SCI "
-                "link to show what is corrupted.",
+                "The memory test (docs/memory-test.md) reads its memory over the SCI "
+                "link to show which blocks are affected.",
                 "The repair options at that point are a reflash by a dealer or PCM "
                 "specialist, or a replacement computer programmed with this Jeep's VIN, "
                 "mileage and immobilizer data.",
@@ -373,6 +373,6 @@ def diagnose(events: list[dict]) -> Diagnosis:
             f"With the engine idling, wiggle the {who}'s connectors and harness while "
             "watching for a stumble or a new code.",
             "If the supply checks out and it keeps returning, treat it as an internal "
-            "fault and go to Phase 2 (docs/phase2-sci-interface.md).",
+            "fault and go to the memory test (docs/memory-test.md).",
         ],
     )

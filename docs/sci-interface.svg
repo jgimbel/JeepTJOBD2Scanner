@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" font-family="Helvetica, Arial, sans-serif" font-size="14">
+  <title>SCI interface: Arduino Mega 2560 to the OBD2 plug</title>
+  <rect width="800" height="440" fill="#ffffff"/>
+
+  <g fill="none" stroke="#1f2933" stroke-width="2">
+    <!-- Mega and OBD2 plug outlines -->
+    <rect x="30" y="50" width="180" height="330" rx="8"/>
+    <rect x="600" y="50" width="170" height="330" rx="8"/>
+
+    <!-- TX2 to pin 6 through R1 -->
+    <path d="M210 100 H300"/>
+    <rect x="300" y="91" width="64" height="18" fill="#ffffff"/>
+    <path d="M364 100 H600"/>
+
+    <!-- RX2 to pin 7 through R2 -->
+    <path d="M210 170 H250"/>
+    <rect x="250" y="161" width="64" height="18" fill="#ffffff"/>
+    <path d="M314 170 H600"/>
+
+    <!-- R3 pull-up from the pin 7 line to 5V -->
+    <path d="M410 170 V186"/>
+    <rect x="401" y="186" width="18" height="34" fill="#ffffff"/>
+    <path d="M410 220 V240 H210"/>
+
+    <!-- C1 from the pin 7 line to ground -->
+    <path d="M500 170 V200"/>
+    <path d="M484 200 H516 M484 208 H516"/>
+    <path d="M500 208 V226"/>
+    <path d="M486 226 H514 M491 232 H509 M496 238 H504"/>
+
+    <!-- A0 divider: R4 to pin 16, R5 to ground -->
+    <path d="M210 300 H400"/>
+    <rect x="400" y="291" width="64" height="18" fill="#ffffff"/>
+    <path d="M464 300 H600"/>
+    <path d="M310 300 V312"/>
+    <rect x="301" y="312" width="18" height="34" fill="#ffffff"/>
+    <path d="M310 346 V360"/>
+
+    <!-- Ground rail -->
+    <path d="M210 360 H600"/>
+  </g>
+
+  <!-- Junction dots -->
+  <g fill="#1f2933">
+    <circle cx="410" cy="170" r="4"/>
+    <circle cx="500" cy="170" r="4"/>
+    <circle cx="310" cy="300" r="4"/>
+    <circle cx="310" cy="360" r="4"/>
+  </g>
+
+  <g fill="#1f2933">
+    <text x="120" y="38" text-anchor="middle" font-weight="bold">Arduino Mega 2560</text>
+    <text x="685" y="38" text-anchor="middle" font-weight="bold">OBD2 plug (to Jeep)</text>
+
+    <!-- Mega pins -->
+    <text x="200" y="105" text-anchor="end">TX2 (pin 16)</text>
+    <text x="200" y="175" text-anchor="end">RX2 (pin 17)</text>
+    <text x="200" y="245" text-anchor="end">5V</text>
+    <text x="200" y="305" text-anchor="end">A0</text>
+    <text x="200" y="365" text-anchor="end">GND</text>
+    <text x="120" y="76" text-anchor="middle" font-size="12">USB to laptop</text>
+
+    <!-- OBD2 pins -->
+    <text x="610" y="96">pin 6</text>
+    <text x="610" y="112" font-size="12">computer receives</text>
+    <text x="610" y="166">pin 7</text>
+    <text x="610" y="182" font-size="12">computer transmits</text>
+    <text x="610" y="296">pin 16</text>
+    <text x="610" y="312" font-size="12">battery + (sense only)</text>
+    <text x="610" y="356">pins 4 and 5</text>
+    <text x="610" y="372" font-size="12">ground</text>
+
+    <!-- Component values -->
+    <text x="332" y="84" text-anchor="middle">R1 100 Ω</text>
+    <text x="282" y="154" text-anchor="middle">R2 1 kΩ</text>
+    <text x="426" y="208">R3 1 kΩ</text>
+    <text x="524" y="209">C1 470 pF</text>
+    <text x="432" y="284" text-anchor="middle">R4 27 kΩ</text>
+    <text x="326" y="334">R5 5 kΩ</text>
+    <text x="326" y="350" font-size="12">(two 10 kΩ in parallel)</text>
+
+    <text x="30" y="412" font-size="12">Nothing connects to pin 2 (the J1850 bus). Layout B: the R1 wire goes to pin 12 instead of pin 6.</text>
+    <text x="30" y="429" font-size="12">Values from the ChryslerScanner V1.44 schematic; R1 and R2 stand in for its switch chips.</text>
+  </g>
+</svg>

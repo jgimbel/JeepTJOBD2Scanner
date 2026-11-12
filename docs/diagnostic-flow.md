@@ -24,7 +24,8 @@ plugs.
 - **Four plugs**: NGC. Normal for 2005–2006; a few late 2004 builds are reported
   to have it.
 
-Phase 1 works the same either way. It matters for Phase 2.
+The OBD2 steps work the same either way. It matters for the memory test, which
+was designed around the JTEC.
 
 ## Step 1 — Multimeter, before any software
 
@@ -99,10 +100,10 @@ This is the decisive test.
   check its own power     /   \                |
   and grounds at the  supply    no supply   one-time event;
   connector, then     evidence  evidence    keep watching for
-  Phase 2 or replace     |         |        a few days
+  memory test or replace |         |        a few days
                     fix supply  intermittent:
                     and retest  more logs, wiggle
-                                test, then Phase 2
+                                test, then memory test
 ```
 
 ## Step 5 — Act on the result
@@ -114,8 +115,8 @@ ground pin, with the key on. A broken wire or corroded pin there looks exactly
 like a dead computer from the outside. If those are good, the fault is inside
 the module. Options are a reflash by a dealer or PCM specialist, or a
 replacement programmed with this Jeep's VIN, mileage and, where fitted,
-immobilizer data. [Phase 2](phase2-sci-interface.md) can show what in memory is
-wrong first.
+immobilizer data. The [memory test](memory-test.md) can show which blocks of its
+memory are affected first.
 
 **Returns after cranking with supply evidence.** Battery load test, terminals,
 grounds, charging system. Repeat Step 4 afterwards. If it stays away, the
@@ -124,7 +125,7 @@ computer was never at fault.
 **Returns after running with no supply evidence.** Intermittent. Take more
 `watch` logs across cold starts, do a wiggle test on the harness and connectors
 at idle, and recheck the Step 1 numbers hot. If it keeps returning with a clean
-supply, treat it as internal.
+supply, treat it as internal and run the [memory test](memory-test.md).
 
 **Does not return.** Consistent with a one-time upset. Drive for several days,
 take another snapshot, and make sure the cause of the original event is fixed.

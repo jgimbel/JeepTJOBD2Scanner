@@ -16,10 +16,15 @@ It answers three questions, in order:
 3. **Is the supply to blame?** Voltage codes, low resting voltage, cranking
    dips, or the computer going silent.
 
-> **Status:** every command has been run against the built-in simulator only.
-> It has not been run on the Jeep yet. The first real run is the real test;
-> everything the adapter says is recorded in `tjdiag-data/traffic.log` so any
-> surprise can be fixed from that log.
+If those point at the engine computer itself, a second stage reads its memory
+over Chrysler's SCI link and tests it block by block. That stage needs a small
+interface board you build around an Arduino Mega 2560; see
+[Memory test](#memory-test).
+
+> **Status:** every command has been run against built-in simulators only.
+> Nothing has been run on the Jeep yet, and the interface board has not been
+> built. The first real runs are the real test; everything the adapters say is
+> recorded in log files so any surprise can be fixed from them.
 
 ## Install
 
@@ -83,7 +88,8 @@ and what to do next.
 | `raw "TEXT"` | Sends one command to the adapter and prints the reply. |
 
 Global options: `--port`, `--baud`, `--dir` (where files are saved, default
-`./tjdiag-data`), `--sim` (see below).
+`./tjdiag-data`), `--sim` (see below). They go before the command name, for
+example `tjdiag --port COM5 snapshot`.
 
 ## Try it without the Jeep
 
@@ -114,12 +120,33 @@ Scenarios: `pcm`, `tcm`, `pcm-silent-tcm`, `lowvolt`, `transient`, `clean`,
 - **This tool only reads and clears.** It cannot write to or reprogram a
   computer.
 
-## What this cannot do
+## Memory test
 
 No ELM327-type adapter can use Chrysler's SCI link, which is the only route to
-the computer's own memory. If the procedure ends at "the computer fails its own
-self-test", the next step is the interface described in
-[docs/phase2-sci-interface.md](docs/phase2-sci-interface.md).
+the engine computer's own memory. If the procedure above ends at "the computer
+fails its own self-test", the next step is to read that memory and test it
+block by block.
+
+**Hardware:** an Arduino Mega 2560 running the open-source ChryslerScanner
+firmware, five resistors, a capacitor and an OBD2 plug. Schematic, parts and
+bring-up checks are in
+[docs/sci-interface-hardware.md](docs/sci-interface-hardware.md).
+
+**Scripts:** the `tjdiag mem` commands. The full procedure, and what each
+result does and does not prove, is in
+[docs/memory-test.md](docs/memory-test.md).
+
+| Command | What it does |
+|---|---|
+| `mem selftest` | Checks the board on the bench: firmware, loopback, battery sense. |
+| `mem probe` | At the Jeep: is the link alive, which read commands answer, how much memory there is, how long a dump will take. |
+| `mem faults` | Reads the engine computer's own fault list over SCI. |
+| `mem dump --region rom\|rom16\|eeprom` | Reads a region to a file, twice by default. Resumable. |
+| `mem test [--reference FILE] [--vin VIN]` | Tests the saved dumps block by block and prints the report. |
+| `mem ram` | Captures the RAM tables. Informational and experimental. |
+
+These commands can only read. Every command that writes, erases or operates an
+actuator is refused inside the tool before it reaches the wire.
 
 ## Layout
 
@@ -134,9 +161,15 @@ tjdiag/
   sniff.py       PCI bus capture
   interpret.py   diagnosis rules
   sim.py         simulated adapter and vehicle
+  scanner.py     driver for the Mega interface board
+  sci.py         SCI read commands and the read-only guard
+  memory.py      memory probing and resumable dumps
+  memtest.py     block tests and report
+  scisim.py      simulated interface board and engine computer
+  memcli.py      the 'mem' commands
   cli.py         command line
-tests/           pytest suite (runs against the simulator)
-docs/            diagnostic flow, adapter evaluation, Phase 2 design
+tests/           pytest suite (runs against the simulators)
+docs/            diagnostic flow, adapter evaluation, interface hardware, memory test
 ```
 
 ## Tests

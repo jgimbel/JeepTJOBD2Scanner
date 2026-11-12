@@ -18,7 +18,7 @@ LIMITED = "limited"
 UNUSABLE = "unusable"
 
 _VERDICT_TEXT = {
-    USABLE: "This adapter can do everything Phase 1 needs.",
+    USABLE: "This adapter can do everything the OBD2 diagnosis needs.",
     LIMITED: "This adapter can read and clear codes, but something optional is missing (see WARN lines).",
     UNUSABLE: "This adapter cannot be used for this job as tested (see FAIL lines).",
 }
@@ -170,7 +170,7 @@ def run_probe(elm: Elm327, monitor_seconds: float = 3.0) -> ProbeResult:
         "Chrysler SCI link",
         INFO,
         "not available on any ELM327-type adapter; reading the computer's memory "
-        "needs the Phase 2 interface (docs/phase2-sci-interface.md)",
+        "needs the SCI interface board (docs/sci-interface-hardware.md)",
     )
     result.verdict = LIMITED if limited or protocol != J1850_VPW else USABLE
     return result
