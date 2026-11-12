@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" font-family="Helvetica, Arial, sans-serif" font-size="14">
-  <title>SCI interface: ESP32 DevKit through a level shifter to the OBD2 plug</title>
+  <title>SCI interface: ESP32 board through a level shifter to the OBD2 plug</title>
   <rect width="920" height="470" fill="#ffffff"/>
 
   <g fill="none" stroke="#1f2933" stroke-width="2">
@@ -59,17 +59,17 @@
   </g>
 
   <g fill="#1f2933">
-    <text x="115" y="38" text-anchor="middle" font-weight="bold">ESP32 DevKit (WROOM-32)</text>
+    <text x="115" y="38" text-anchor="middle" font-weight="bold">ESP32 board</text>
     <text x="370" y="60" text-anchor="middle" font-weight="bold">Level shifter</text>
     <text x="805" y="38" text-anchor="middle" font-weight="bold">OBD2 plug (to Jeep)</text>
 
     <!-- ESP32 pins -->
     <text x="115" y="76" text-anchor="middle" font-size="12">USB to laptop</text>
-    <text x="190" y="105" text-anchor="end">GPIO17 (TX2)</text>
-    <text x="190" y="175" text-anchor="end">GPIO16 (RX2)</text>
+    <text x="190" y="105" text-anchor="end">SCI TX</text>
+    <text x="190" y="175" text-anchor="end">SCI RX</text>
     <text x="190" y="225" text-anchor="end">3V3</text>
-    <text x="190" y="275" text-anchor="end">VIN (5V)</text>
-    <text x="190" y="345" text-anchor="end">GPIO34</text>
+    <text x="190" y="275" text-anchor="end">5V</text>
+    <text x="190" y="345" text-anchor="end">BATT ADC</text>
     <text x="190" y="401" text-anchor="end">GND</text>
 
     <!-- Level shifter pins -->
@@ -101,7 +101,7 @@
     <text x="276" y="372">R5 15 kΩ</text>
     <text x="392" y="371">C2 100 nF</text>
 
-    <text x="30" y="438" font-size="12">Every point marked 5V joins the VIN (5V) line. The level shifter's GND pins join the ground line.</text>
-    <text x="30" y="455" font-size="12">Nothing connects to pin 2 (the J1850 bus). Layout B: the HV1 wire goes to pin 12 instead of pin 6.</text>
+    <text x="30" y="438" font-size="12">SCI TX, SCI RX and BATT ADC are GPIO numbers that depend on the board: see the pin table. Every 5V point joins the 5V line.</text>
+    <text x="30" y="455" font-size="12">The level shifter's GND pins join the ground line. Nothing connects to OBD2 pin 2. Layout B: HV1 goes to pin 12, not pin 6.</text>
   </g>
 </svg>

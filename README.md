@@ -132,7 +132,7 @@ block by block.
 | Board | Firmware | Doc |
 |---|---|---|
 | Arduino Mega 2560 | The open-source ChryslerScanner firmware, unchanged. Proven on real Chrysler computers | [docs/sci-interface-hardware.md](docs/sci-interface-hardware.md) |
-| ESP32 DevKit (WROOM-32) | This project's own, in `firmware/esp32-sci-bridge/`. Read-only by construction, but new; needs a level shifter | [docs/sci-interface-esp32.md](docs/sci-interface-esp32.md) |
+| ESP32: Waveshare ESP32-C5-WIFI6-KIT, or a WROOM-32 DevKit | This project's own, in `firmware/esp32-sci-bridge/`. Read-only by construction, but new; needs a level shifter | [docs/sci-interface-esp32.md](docs/sci-interface-esp32.md) |
 
 **Scripts:** the `tjdiag mem` commands. The full procedure, and what each
 result does and does not prove, is in
@@ -171,7 +171,7 @@ tjdiag/
   memcli.py      the 'mem' commands
   cli.py         command line
 firmware/
-  esp32-sci-bridge/   read-only SCI bridge firmware for an ESP32 DevKit
+  esp32-sci-bridge/   read-only SCI bridge firmware for an ESP32 board
 tests/           pytest suite (runs against the simulators and the firmware core)
 docs/            diagnostic flow, adapter evaluation, interface hardware, memory test
 ```

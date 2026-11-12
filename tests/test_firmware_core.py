@@ -430,18 +430,39 @@ def test_selftest_fails_without_the_jumper(bench, capsys):
 # -- the ESP32 sketch itself ---------------------------------------------------------
 
 
-def test_sketch_type_checks_against_the_arduino_api_stand_in():
+@pytest.mark.parametrize("target", [None, "CONFIG_IDF_TARGET_ESP32C5"], ids=["wroom-32", "esp32-c5"])
+def test_sketch_type_checks_against_the_arduino_api_stand_in(target):
     """Not a real ESP32 compile: catches syntax and type errors in the wrapper."""
     compiler = shutil.which("g++") or shutil.which("clang++")
     if compiler is None:
         pytest.skip("no C++ compiler available")
     stub = Path(__file__).resolve().parent / "arduino_stub"
+    defines = [f"-D{target}=1"] if target else []
     result = subprocess.run(
         [compiler, "-std=c++11", "-Wall", "-Wextra", "-Werror", "-fsyntax-only", "-x", "c++",
-         "-I", str(stub), "-I", str(FIRMWARE), str(FIRMWARE / "esp32-sci-bridge.ino")],
+         *defines, "-I", str(stub), "-I", str(FIRMWARE), str(FIRMWARE / "esp32-sci-bridge.ino")],
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_esp32_c5_pins_avoid_the_ones_the_chip_and_board_reserve():
+    source = (FIRMWARE / "esp32-sci-bridge.ino").read_text()
+    c5_block = source.split("#if defined(CONFIG_IDF_TARGET_ESP32C5)")[1].split("#else")[0]
+    pins = {name: int(value) for name, value in
+            __import__("re").findall(r"const int (\w+) = (\d+);", c5_block)}
+    reserved = {
+        2, 3, 7, 25, 26, 27, 28,  # boot-mode (strapping) pins
+        11, 12,  # serial port to the laptop
+        13, 14,  # USB
+        *range(15, 23),  # flash and PSRAM
+        6,  # the Waveshare board's own battery monitor
+    }
+    assert set(pins) == {"SCI_RX_PIN", "SCI_TX_PIN", "BATTERY_PIN"}
+    assert not set(pins.values()) & reserved
+    assert len(set(pins.values())) == 3
+    assert 1 <= pins["BATTERY_PIN"] <= 6  # the ESP32-C5's ADC pins
+    assert "Serial2" not in c5_block
 
 
 def test_firmware_and_python_guards_allow_the_same_low_speed_commands():

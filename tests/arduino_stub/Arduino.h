@@ -24,7 +24,10 @@ class HardwareSerial {
 };
 
 extern HardwareSerial Serial;
-extern HardwareSerial Serial2;
+extern HardwareSerial Serial1;
+#if !defined(CONFIG_IDF_TARGET_ESP32C5)
+extern HardwareSerial Serial2;  // the ESP32-C5 has no third serial port
+#endif
 
 unsigned long millis();
 void delayMicroseconds(uint32_t microseconds);
