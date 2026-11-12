@@ -86,7 +86,8 @@ def test_open_fails_clearly_when_nothing_answers():
 def test_status_battery_and_firmware_version():
     board, _ = opened()
     status = board.status()
-    assert status["is_mega2560"] and status["connected_to_vehicle"]
+    assert status["mcu"] == "ATmega2560" and status["connected_to_vehicle"]
+    assert board.firmware == sc.UPSTREAM
     assert status["battery_volts"] == 12.6
     assert board.battery_volts() == 12.6
     assert board.firmware_version() == "0.9.12"
@@ -131,6 +132,9 @@ def test_only_listed_packet_types_can_be_sent():
         "2B",  # security seed
         "2C 12 34",  # security key
         "F4 00",  # RAM table selector, but not in high-speed mode
+        "28 00 10 27",  # a write command riding behind an allowed read
+        "10 17",  # an erase riding behind the fault list request
+        "26 00 00",  # allowed command, wrong length
     ],
 )
 def test_write_and_control_commands_never_reach_the_wire(message):
@@ -151,6 +155,11 @@ def test_ordinary_commands_are_refused_in_high_speed_mode():
     assert board.high_speed
     with pytest.raises(sci.ForbiddenCommand):
         board.send_sci(bytes.fromhex("26 00 00 00"))
+    with pytest.raises(sci.ForbiddenCommand):
+        board.send_sci(bytes.fromhex("F4 10 FE"))  # an offset that is really a command
+    with pytest.raises(sci.ForbiddenCommand):
+        board.send_sci(bytes.fromhex("FE 27"))
+    assert board.send_sci(bytes.fromhex("F4 00 01")) is not None
     assert board.send_sci(bytes([sci.CMD_LOW_SPEED])) == bytes([sci.CMD_LOW_SPEED])
     assert not board.high_speed
     assert board.send_sci(bytes.fromhex("28 00 20")) is not None

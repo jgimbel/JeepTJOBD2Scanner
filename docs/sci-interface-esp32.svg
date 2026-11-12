@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" font-family="Helvetica, Arial, sans-serif" font-size="14">
+  <title>SCI interface: ESP32 DevKit through a level shifter to the OBD2 plug</title>
+  <rect width="920" height="470" fill="#ffffff"/>
+
+  <g fill="none" stroke="#1f2933" stroke-width="2">
+    <!-- ESP32, level shifter and OBD2 plug outlines -->
+    <rect x="30" y="50" width="170" height="360" rx="8"/>
+    <rect x="300" y="70" width="140" height="170" rx="8"/>
+    <rect x="720" y="50" width="170" height="360" rx="8"/>
+
+    <!-- ESP32 to the level shifter's 3.3 V side -->
+    <path d="M200 100 H300"/>
+    <path d="M200 170 H300"/>
+    <path d="M200 220 H300"/>
+
+    <!-- 5 V from VIN to the level shifter's HV pin -->
+    <path d="M200 270 H480 V220 H440"/>
+
+    <!-- HV1 to pin 6, with pull-up R2 -->
+    <path d="M440 100 H720"/>
+    <path d="M560 100 V90"/>
+    <rect x="551" y="56" width="18" height="34" fill="#ffffff"/>
+    <path d="M560 56 V44 M548 44 H572"/>
+
+    <!-- HV2 to pin 7, with pull-up R3 and filter C1 -->
+    <path d="M440 170 H720"/>
+    <path d="M520 170 V184"/>
+    <rect x="511" y="184" width="18" height="34" fill="#ffffff"/>
+    <path d="M520 218 V230 M508 230 H532"/>
+    <path d="M610 170 V198"/>
+    <path d="M594 198 H626 M594 206 H626"/>
+    <path d="M610 206 V224"/>
+    <path d="M596 224 H624 M601 230 H619 M606 236 H614"/>
+
+    <!-- Battery divider: R4 to pin 16, R5 and C2 to ground -->
+    <path d="M200 340 H480"/>
+    <rect x="480" y="331" width="64" height="18" fill="#ffffff"/>
+    <path d="M544 340 H720"/>
+    <path d="M260 340 V352"/>
+    <rect x="251" y="352" width="18" height="30" fill="#ffffff"/>
+    <path d="M260 382 V396"/>
+    <path d="M370 340 V362"/>
+    <path d="M354 362 H386 M354 370 H386"/>
+    <path d="M370 370 V396"/>
+
+    <!-- Ground rail -->
+    <path d="M200 396 H720"/>
+  </g>
+
+  <!-- Junction dots -->
+  <g fill="#1f2933">
+    <circle cx="560" cy="100" r="4"/>
+    <circle cx="520" cy="170" r="4"/>
+    <circle cx="610" cy="170" r="4"/>
+    <circle cx="260" cy="340" r="4"/>
+    <circle cx="370" cy="340" r="4"/>
+    <circle cx="260" cy="396" r="4"/>
+    <circle cx="370" cy="396" r="4"/>
+  </g>
+
+  <g fill="#1f2933">
+    <text x="115" y="38" text-anchor="middle" font-weight="bold">ESP32 DevKit (WROOM-32)</text>
+    <text x="370" y="60" text-anchor="middle" font-weight="bold">Level shifter</text>
+    <text x="805" y="38" text-anchor="middle" font-weight="bold">OBD2 plug (to Jeep)</text>
+
+    <!-- ESP32 pins -->
+    <text x="115" y="76" text-anchor="middle" font-size="12">USB to laptop</text>
+    <text x="190" y="105" text-anchor="end">GPIO17 (TX2)</text>
+    <text x="190" y="175" text-anchor="end">GPIO16 (RX2)</text>
+    <text x="190" y="225" text-anchor="end">3V3</text>
+    <text x="190" y="275" text-anchor="end">VIN (5V)</text>
+    <text x="190" y="345" text-anchor="end">GPIO34</text>
+    <text x="190" y="401" text-anchor="end">GND</text>
+
+    <!-- Level shifter pins -->
+    <text x="310" y="105">LV1</text>
+    <text x="430" y="105" text-anchor="end">HV1</text>
+    <text x="310" y="175">LV2</text>
+    <text x="430" y="175" text-anchor="end">HV2</text>
+    <text x="310" y="225">LV</text>
+    <text x="430" y="225" text-anchor="end">HV</text>
+    <text x="370" y="140" text-anchor="middle" font-size="12">3.3 V side | 5 V side</text>
+
+    <!-- OBD2 pins -->
+    <text x="730" y="96">pin 6</text>
+    <text x="730" y="112" font-size="12">computer receives</text>
+    <text x="730" y="166">pin 7</text>
+    <text x="730" y="182" font-size="12">computer transmits</text>
+    <text x="730" y="336">pin 16</text>
+    <text x="730" y="352" font-size="12">battery + (sense only)</text>
+    <text x="730" y="386">pins 4 and 5</text>
+    <text x="730" y="401" font-size="12">ground</text>
+
+    <!-- Component values and supply tags -->
+    <text x="560" y="38" text-anchor="middle">5V</text>
+    <text x="576" y="78">R2 1 kΩ</text>
+    <text x="536" y="206">R3 1 kΩ</text>
+    <text x="520" y="248" text-anchor="middle">5V</text>
+    <text x="634" y="207">C1 470 pF</text>
+    <text x="512" y="324" text-anchor="middle">R4 100 kΩ</text>
+    <text x="276" y="372">R5 15 kΩ</text>
+    <text x="392" y="371">C2 100 nF</text>
+
+    <text x="30" y="438" font-size="12">Every point marked 5V joins the VIN (5V) line. The level shifter's GND pins join the ground line.</text>
+    <text x="30" y="455" font-size="12">Nothing connects to pin 2 (the J1850 bus). Layout B: the HV1 wire goes to pin 12 instead of pin 6.</text>
+  </g>
+</svg>

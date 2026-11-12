@@ -9,12 +9,13 @@ from dataclasses import asdict
 from pathlib import Path
 
 from . import memory, memtest, sci
-from .scanner import USB_BAUD, Scanner, ScannerError
+from .scanner import BRIDGE, UPSTREAM, USB_BAUD, Scanner
 from .scisim import SCENARIOS, make_mem_sim
 from .snapshot import now_iso, reserve_path
 from .transport import LoggingTransport, SerialTransport
 
-EXPECTED_FIRMWARE = "0.9"
+# What each firmware should report about itself: version prefix and chip.
+EXPECTED = {UPSTREAM: ("0.9", "ATmega2560"), BRIDGE: ("1.", "ESP32")}
 
 
 def add_parser(sub: argparse._SubParsersAction) -> None:
@@ -90,20 +91,22 @@ def _line(status: str, name: str, detail: str) -> None:
 
 
 def cmd_selftest(scanner: Scanner) -> int:
-    _line("PASS", "Firmware handshake", "the board answers as a ChryslerScanner")
+    _line("PASS", "Firmware handshake", f"the board answers as '{scanner.firmware}'")
+    wanted_version, wanted_mcu = EXPECTED[scanner.firmware]
     version = scanner.firmware_version()
-    if version.startswith(EXPECTED_FIRMWARE):
+    if version.startswith(wanted_version):
         _line("PASS", "Firmware version", version)
     else:
         _line(
             "WARN", "Firmware version",
-            f"{version}; this tool was written against {EXPECTED_FIRMWARE}.x and may not match",
+            f"{version}; this tool was written against {wanted_version}x and may not match",
         )
     status = scanner.status()
-    if status["is_mega2560"]:
-        _line("PASS", "Microcontroller", "ATmega2560")
+    if status["mcu"] == wanted_mcu:
+        _line("PASS", "Microcontroller", wanted_mcu)
     else:
-        _line("WARN", "Microcontroller", f"signature {status['mcu_signature']}, expected an ATmega2560")
+        found = status["mcu"] or f"signature {status['mcu_signature']}"
+        _line("WARN", "Microcontroller", f"{found}, expected {wanted_mcu} for this firmware")
     if status["battery_volts"]:
         _line("INFO", "Battery sense", f"{status['battery_volts']:.1f} V on the divider")
     else:
@@ -125,7 +128,7 @@ def cmd_selftest(scanner: Scanner) -> int:
         _line(
             "FAIL", "Serial loopback",
             "nothing came back on RX2. On the bench, fit a jumper between the OBD "
-            "plug's pin 6 and pin 7 (or Mega pins 16 and 17) and run this again",
+            "plug's pin 6 and pin 7 and run this again",
         )
         ok = False
     print()

@@ -34,6 +34,14 @@ READ_ONLY_COMMANDS = {
     CMD_EEPROM: "read EEPROM byte",
     CMD_LOW_SPEED: "select low-speed mode",
 }
+_LOW_SPEED_LENGTHS = {
+    CMD_FAULT_LIST: 1,
+    CMD_HIGH_SPEED: 1,
+    CMD_ROM_16: 3,
+    CMD_ROM_24: 4,
+    CMD_EEPROM: 3,
+    CMD_LOW_SPEED: 1,
+}
 # High-speed mode: F0-FF select a RAM table to read from (FE is "low speed").
 RAM_TABLES = tuple(t for t in range(0xF0, 0x100) if t != CMD_LOW_SPEED)
 RAM_TABLE_SIZE = 0xF0
@@ -54,13 +62,26 @@ def check_read_only(message: bytes, high_speed: bool = False) -> None:
         raise ForbiddenCommand("empty message")
     command = message[0]
     if high_speed:
-        allowed = command in RAM_TABLES or command == CMD_LOW_SPEED
+        if command == CMD_LOW_SPEED:
+            allowed = len(message) == 1
+        elif command in RAM_TABLES:
+            # Offsets only (or FF for the whole table): a byte of F0 or above
+            # would be taken as a new command.
+            whole_table = len(message) == 2 and message[1] == 0xFF
+            allowed = whole_table or (
+                len(message) <= 1 + RAM_TABLE_SIZE
+                and all(offset < RAM_TABLE_SIZE for offset in message[1:])
+            )
+        else:
+            allowed = False
     else:
-        allowed = command in READ_ONLY_COMMANDS
+        # Exact lengths, so nothing can ride along behind an allowed command.
+        allowed = _LOW_SPEED_LENGTHS.get(command) == len(message)
     if not allowed:
         mode = "high-speed" if high_speed else "low-speed"
         raise ForbiddenCommand(
-            f"command {command:02X} is not on the {mode} read-only list and was not sent"
+            f"message {bytes(message).hex(' ').upper()} is not an allowed {mode} read "
+            "and was not sent"
         )
 
 

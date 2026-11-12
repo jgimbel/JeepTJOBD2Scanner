@@ -1,10 +1,13 @@
-# SCI interface hardware
+# SCI interface hardware — Arduino Mega version
 
 A small board that lets the laptop talk to the engine computer over Chrysler's
 SCI serial link, which is how its memory is read. It is an Arduino Mega 2560
 running the open-source
 [ChryslerScanner](https://github.com/laszlodaniel/ChryslerScanner) firmware,
 plus five resistors and a capacitor.
+
+There is also an [ESP32 version](sci-interface-esp32.md) with this project's
+own read-only firmware; that page compares the two.
 
 > **Status:** designed from the upstream project's schematic and firmware
 > source. It has not been built or connected to a vehicle. The first two checks
@@ -15,11 +18,12 @@ plus five resistors and a capacitor.
 
 ## Why a Mega 2560
 
-The firmware needs a Mega: about 46 KB of program space, 4 KB of RAM, and a
-hardware serial port for the Jeep separate from the USB one. An Uno R3 has
-32 KB, 2 KB and a single port, so it cannot run it. A Mega also has 5 V logic,
-which is what the SCI lines use; a 3.3 V board such as an ESP32 must not be
-wired to the Jeep this way.
+The upstream firmware needs a Mega: about 46 KB of program space, 4 KB of RAM,
+and a hardware serial port for the Jeep separate from the USB one. An Uno R3
+has 32 KB, 2 KB and a single port, so it cannot run it. A Mega also has 5 V
+logic, which is what the SCI lines use. A 3.3 V board such as an ESP32 must not
+be wired to the Jeep the way this page shows; it needs the level shifter and
+firmware described in the [ESP32 version](sci-interface-esp32.md).
 
 ## Parts
 

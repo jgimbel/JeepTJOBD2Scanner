@@ -18,11 +18,11 @@ It answers three questions, in order:
 
 If those point at the engine computer itself, a second stage reads its memory
 over Chrysler's SCI link and tests it block by block. That stage needs a small
-interface board you build around an Arduino Mega 2560; see
+interface board you build around an Arduino Mega 2560 or an ESP32; see
 [Memory test](#memory-test).
 
 > **Status:** every command has been run against built-in simulators only.
-> Nothing has been run on the Jeep yet, and the interface board has not been
+> Nothing has been run on the Jeep yet, and neither interface board has been
 > built. The first real runs are the real test; everything the adapters say is
 > recorded in log files so any surprise can be fixed from them.
 
@@ -127,10 +127,12 @@ the engine computer's own memory. If the procedure above ends at "the computer
 fails its own self-test", the next step is to read that memory and test it
 block by block.
 
-**Hardware:** an Arduino Mega 2560 running the open-source ChryslerScanner
-firmware, five resistors, a capacitor and an OBD2 plug. Schematic, parts and
-bring-up checks are in
-[docs/sci-interface-hardware.md](docs/sci-interface-hardware.md).
+**Hardware:** one of two boards, both driven by the same commands.
+
+| Board | Firmware | Doc |
+|---|---|---|
+| Arduino Mega 2560 | The open-source ChryslerScanner firmware, unchanged. Proven on real Chrysler computers | [docs/sci-interface-hardware.md](docs/sci-interface-hardware.md) |
+| ESP32 DevKit (WROOM-32) | This project's own, in `firmware/esp32-sci-bridge/`. Read-only by construction, but new; needs a level shifter | [docs/sci-interface-esp32.md](docs/sci-interface-esp32.md) |
 
 **Scripts:** the `tjdiag mem` commands. The full procedure, and what each
 result does and does not prove, is in
@@ -168,7 +170,9 @@ tjdiag/
   scisim.py      simulated interface board and engine computer
   memcli.py      the 'mem' commands
   cli.py         command line
-tests/           pytest suite (runs against the simulators)
+firmware/
+  esp32-sci-bridge/   read-only SCI bridge firmware for an ESP32 DevKit
+tests/           pytest suite (runs against the simulators and the firmware core)
 docs/            diagnostic flow, adapter evaluation, interface hardware, memory test
 ```
 
@@ -178,3 +182,6 @@ docs/            diagnostic flow, adapter evaluation, interface hardware, memory
 pip install -e ".[dev]"
 pytest
 ```
+
+The firmware tests compile part of the ESP32 firmware for the laptop and need
+`g++` or `clang++`; they are skipped if neither is installed.

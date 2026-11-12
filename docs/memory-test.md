@@ -1,8 +1,9 @@
 # Testing the engine computer's memory
 
 This reads the engine computer's memory over the SCI link, one byte at a time,
-and reports on it block by block. It needs the interface in
-[sci-interface-hardware.md](sci-interface-hardware.md).
+and reports on it block by block. It needs an interface board: either the
+[Arduino Mega version](sci-interface-hardware.md) or the
+[ESP32 version](sci-interface-esp32.md). The commands are the same for both.
 
 Do the OBD2 steps in [diagnostic-flow.md](diagnostic-flow.md) first. This is
 worth the effort only if they end at "the engine computer fails its own
@@ -48,7 +49,7 @@ comparison matters.
 
 ## Procedure
 
-Replace `<port>` with the Mega's serial port (`tjdiag ports`).
+Replace `<port>` with the interface board's serial port (`tjdiag ports`).
 
 ### 1. Check the board
 
@@ -56,7 +57,8 @@ Replace `<port>` with the Mega's serial port (`tjdiag ports`).
 tjdiag --port <port> mem selftest
 ```
 
-On the bench with the loopback jumper, as described in the hardware doc.
+On the bench with the loopback jumper, as described in the board's hardware doc.
+It also reports which firmware the board is running.
 
 ### 2. Connect and probe
 

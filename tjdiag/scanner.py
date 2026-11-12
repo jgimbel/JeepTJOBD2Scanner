@@ -35,6 +35,13 @@ from .transport import Transport
 SYNC = 0x3D
 USB_BAUD = 250000
 HANDSHAKE_TEXT = b"CHRYSLERCCDSCISCANNER"
+BRIDGE_HANDSHAKE_TEXT = b"TJDIAGSCIBRIDGE"
+
+# The two firmwares this driver can talk to.
+UPSTREAM = "ChryslerScanner"  # open-source firmware on an Arduino Mega 2560
+BRIDGE = "tjdiag SCI bridge"  # this project's read-only firmware on an ESP32
+_FIRMWARE_BY_HANDSHAKE = {HANDSHAKE_TEXT: UPSTREAM, BRIDGE_HANDSHAKE_TEXT: BRIDGE}
+_MCU_BY_SIGNATURE = {bytes([0x1E, 0x98, 0x01]): "ATmega2560", b"ESP": "ESP32"}
 
 BUS_USB, BUS_CCD, BUS_PCM, BUS_TCM = 0, 1, 2, 3
 
@@ -195,6 +202,7 @@ class Scanner:
         self._queue: list[Packet] = []
         self.sci_settings: int | None = None
         self.high_speed = False
+        self.firmware: str | None = None
 
     # -- packets ------------------------------------------------------------
 
@@ -257,7 +265,7 @@ class Scanner:
             self.drain(0.5)
         raise ScannerError(
             "the board did not answer the handshake. Check the port, and that the "
-            "ChryslerScanner firmware is flashed on the Mega."
+            "firmware is flashed on the board."
         )
 
     def handshake(self) -> bool:
@@ -266,7 +274,10 @@ class Scanner:
             packet = self._wait(BUS_USB, CMD_HANDSHAKE, None, self.timeout)
         except ScannerError:
             return False
-        return packet is not None and packet.payload == HANDSHAKE_TEXT
+        if packet is None or packet.payload not in _FIRMWARE_BY_HANDSHAKE:
+            return False
+        self.firmware = _FIRMWARE_BY_HANDSHAKE[packet.payload]
+        return True
 
     def firmware_version(self) -> str:
         self._send(BUS_USB, CMD_REQUEST, REQ_HWFW)
@@ -283,7 +294,7 @@ class Scanner:
         self.sci_settings = payload[24]
         return {
             "mcu_signature": payload[0:3].hex().upper(),
-            "is_mega2560": payload[0:3] == bytes([0x1E, 0x98, 0x01]),
+            "mcu": _MCU_BY_SIGNATURE.get(bytes(payload[0:3])),
             "free_ram": int.from_bytes(payload[10:12], "big"),
             "connected_to_vehicle": bool(payload[12]),
             "battery_volts": int.from_bytes(payload[13:15], "big") / 1000,
