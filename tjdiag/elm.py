@@ -183,6 +183,7 @@ class Elm327:
         self.transport = transport
         self.timeout = timeout
         self.version: str | None = None
+        self.reports_elm_name = True
 
     # -- raw exchange -----------------------------------------------------
 
@@ -246,10 +247,16 @@ class Elm327:
         """Reset the adapter and switch it to the settings this tool relies on."""
         self._sync()
         reply = self.at("Z", timeout=max(self.timeout, 6.0))
-        if "ELM" not in reply.upper():
+        # Clone adapters often rename themselves ("OBDII v1.5"), so the name is
+        # not the test. What matters is that the adapter obeys an ELM327 command.
+        try:
+            accepted = "OK" in self.at("E0").upper()  # no echo
+        except ElmError:
+            accepted = False
+        if not accepted:
             raise ElmError(f"not an ELM327-type adapter (reset reply: {reply!r})")
         self.version = reply
-        self.at("E0")  # no echo
+        self.reports_elm_name = "ELM" in reply.upper()
         self.at("L0")  # no linefeeds
         self.at("S1")  # spaces between bytes
         self.at("H1")  # show headers: tells us which module answered

@@ -9,7 +9,7 @@ implementations to clones that leave out the one protocol this Jeep needs.
 
 | Need | Why | Checked by `tjdiag probe` |
 |---|---|---|
-| Speaks the ELM327 command set | The tool drives it with those commands | Adapter identity |
+| Speaks the ELM327 command set | The tool drives it with those commands. The name it reports does not matter: clones often call themselves something else, such as "OBDII v1.5" | Adapter identity |
 | SAE J1850 VPW | The 2004 Wrangler's diagnostic bus (connector pin 2). Many clones omit it or leave the pin unconnected | J1850 VPW |
 | Shows message headers | The header carries the address of the module that answered; without it P0601 cannot be attributed to the engine or transmission computer | Module addressing |
 | Prints frame checksums | Lets corrupted replies be detected | Frame checksums |

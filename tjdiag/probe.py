@@ -58,7 +58,15 @@ def run_probe(elm: Elm327, monitor_seconds: float = 3.0) -> ProbeResult:
     except ElmError as exc:
         result.add("Adapter identity", FAIL, str(exc))
         return result
-    result.add("Adapter identity", PASS, f"reports itself as '{version}'")
+    if elm.reports_elm_name:
+        result.add("Adapter identity", PASS, f"reports itself as '{version}'")
+    else:
+        result.add(
+            "Adapter identity",
+            PASS,
+            f"reports itself as '{version}', not as an ELM327, but obeys ELM327 "
+            "commands (usual for clone adapters)",
+        )
     try:
         result.add("Device description", INFO, elm.at("@1"))
     except ElmError:

@@ -153,3 +153,14 @@ def test_a_bare_carriage_return_is_never_sent(connect):
     elm.reset()
     assert sim.bare_cr_count == 0
     assert "04" not in sim.commands
+
+
+def test_a_clone_that_renames_itself_is_accepted():
+    # Seen on a real dongle: it answers the reset with "OBDII  v1.5".
+    sim = make_sim("pcm")
+    sim.version = "OBDII  v1.5"
+    elm = Elm327(sim, timeout=1.0)
+    assert elm.reset() == "OBDII  v1.5"
+    assert not elm.reports_elm_name
+    assert sim.headers and not sim.echo
+    assert elm.obd("03").frames  # and it goes on to work normally

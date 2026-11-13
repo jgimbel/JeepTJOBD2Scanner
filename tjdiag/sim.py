@@ -114,11 +114,13 @@ class SimElm:
         vpw_supported: bool = True,
         unsupported_at: tuple[str, ...] = (),
         prints_checksum: bool = True,
+        version: str = VERSION,
     ):
         self.vehicle = vehicle
         self.vpw_supported = vpw_supported
         self.unsupported_at = unsupported_at
         self.prints_checksum = prints_checksum
+        self.version = version
         self.bare_cr_count = 0
         self.commands: list[str] = []
         self._in = bytearray()
@@ -208,9 +210,9 @@ class SimElm:
             return ["?"]
         if cmd == "Z":
             self._defaults()
-            return [VERSION]
+            return [self.version]
         if cmd == "I":
-            return [VERSION]
+            return [self.version]
         if cmd == "@1":
             return ["OBDII to RS232 Interpreter"]
         if cmd in ("E0", "E1"):

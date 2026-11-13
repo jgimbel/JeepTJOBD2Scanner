@@ -63,3 +63,13 @@ def test_probe_never_clears_codes():
 def test_format_ends_with_a_verdict_line():
     text = probe("pcm").format()
     assert text.splitlines()[-1].startswith("Verdict: USABLE")
+
+
+def test_a_renamed_clone_passes_identity_and_is_judged_on_what_it_can_do():
+    sim = make_sim("pcm")
+    sim.version = "OBDII  v1.5"
+    result = run_probe(Elm327(sim, timeout=1.0), monitor_seconds=1.0)
+    identity = next(c for c in result.checks if c.name == "Adapter identity")
+    assert identity.status == PASS and "OBDII  v1.5" in identity.detail
+    assert "obeys ELM327" in identity.detail
+    assert result.verdict == USABLE
