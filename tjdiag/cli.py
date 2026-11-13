@@ -7,9 +7,11 @@ import sys
 from contextlib import ExitStack
 from pathlib import Path
 
-from . import __version__, interpret, obd
+from . import __version__, interpret, memcli, obd
 from .elm import Elm327, ElmError
 from .probe import UNUSABLE, run_probe
+from .scanner import ScannerError
+from .sci import ForbiddenCommand
 from .sim import SCENARIOS, STAGES, make_sim
 from .sniff import format_sniff, run_sniff
 from .snapshot import (
@@ -33,14 +35,19 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version=f"tjdiag {__version__}")
     parser.add_argument("--port", help="serial port of the adapter (see 'tjdiag ports')")
-    parser.add_argument("--baud", type=int, default=38400, help="serial speed (default 38400)")
+    parser.add_argument(
+        "--baud",
+        type=int,
+        help="serial speed (default 38400 for the OBD2 adapter, 250000 for the interface board)",
+    )
     parser.add_argument(
         "--sim",
         metavar="SCENARIO",
-        help="use the built-in simulator instead of a real adapter: "
+        help="use the built-in simulator instead of real hardware. OBD2 scenarios: "
         + ", ".join(SCENARIOS)
         + "; optionally followed by :"
-        + " or :".join(STAGES),
+        + " or :".join(STAGES)
+        + ". For 'mem' commands see 'tjdiag mem --help'",
     )
     parser.add_argument(
         "--dir",
@@ -66,7 +73,9 @@ def _build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("diagnose", help="interpret everything saved so far")
 
-    raw = sub.add_parser("raw", help="send one command to the adapter and print the reply")
+    memcli.add_parser(sub)
+
+    raw = sub.add_parser("raw", help="send one command to the OBD2 adapter and print the reply")
     raw.add_argument("text", help="for example 'ATRV' or '01 0C'")
     return parser
 
@@ -75,7 +84,7 @@ def _open_adapter(args: argparse.Namespace, out_dir: Path, stack: ExitStack) -> 
     if args.sim:
         transport = make_sim(args.sim)
     elif args.port:
-        transport = SerialTransport(args.port, args.baud)
+        transport = SerialTransport(args.port, args.baud or 38400)
     else:
         raise SystemExit(
             "No adapter selected. Use --port <serial port> (run 'tjdiag ports' to find it) "
@@ -213,6 +222,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_diagnose(out_dir)
 
     try:
+        if args.command == "mem":
+            return memcli.run(args, out_dir)
         with ExitStack() as stack:
             elm = _open_adapter(args, out_dir, stack)
             if args.command == "probe":
@@ -227,7 +238,15 @@ def main(argv: list[str] | None = None) -> int:
                 return _cmd_clear(elm, out_dir, args.yes)
             if args.command == "raw":
                 return _cmd_raw(elm, args.text)
-    except (ElmError, obd.VehicleNotResponding, ValueError, RuntimeError, OSError) as exc:
+    except (
+        ElmError,
+        ScannerError,
+        ForbiddenCommand,
+        obd.VehicleNotResponding,
+        ValueError,
+        RuntimeError,
+        OSError,
+    ) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     return 1

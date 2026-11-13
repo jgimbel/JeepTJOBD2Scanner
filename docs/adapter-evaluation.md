@@ -20,7 +20,7 @@ implementations to clones that leave out the one protocol this Jeep needs.
 
 | Verdict | Meaning |
 |---|---|
-| `USABLE` | Everything Phase 1 needs works. |
+| `USABLE` | Everything the OBD2 diagnosis needs works. |
 | `LIMITED` | Codes can be read and cleared; an optional feature is missing. Good enough to proceed. |
 | `UNUSABLE` | Either it is not an ELM327-type device, or no module answered. |
 
@@ -62,4 +62,5 @@ tjdiag --port <port> --baud 115200 probe
 ELM327-type adapters speak the standard OBD2 buses only. Chrysler's SCI link,
 which is how a factory tool reads the engine computer's own memory, is a
 separate pair of wires with a different signalling scheme. Seeing inside the
-computer needs the interface in [phase2-sci-interface.md](phase2-sci-interface.md).
+computer needs the interface in
+[sci-interface-hardware.md](sci-interface-hardware.md).

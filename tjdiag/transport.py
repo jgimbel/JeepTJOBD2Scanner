@@ -61,15 +61,19 @@ class LoggingTransport:
     vehicle: it shows exactly what the adapter said.
     """
 
-    def __init__(self, inner: Transport, log: TextIO):
+    def __init__(self, inner: Transport, log: TextIO, binary: bool = False):
         self._inner = inner
         self._log = log
+        self._binary = binary
         self._start = time.monotonic()
 
     def _record(self, direction: str, data: bytes) -> None:
         elapsed = time.monotonic() - self._start
-        text = data.decode("ascii", errors="replace")
-        self._log.write(f"{elapsed:9.3f} {direction} {text!r}\n")
+        if self._binary:
+            text = data.hex(" ").upper()
+        else:
+            text = repr(data.decode("ascii", errors="replace"))
+        self._log.write(f"{elapsed:9.3f} {direction} {text}\n")
         self._log.flush()
 
     def write(self, data: bytes) -> None:
